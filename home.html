@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>spacious rentals</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Basic styling for the grid layout */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .house {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+
+    .house img {
+      width: 70%;
+      height: 70%;
+      display: block;
+    }
+
+    .house p {
+      padding: 10px;
+      margin: 0;
+      text-align: center;
+    }
+
+    /* Modal styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 900;
+      left: 0;
+      top: 0;
+      width: 70%;
+      height: 70%;
+      background-color: rgba(0,0,0,0.9);
+    }
+
+    .modal-content {
+      position: relative;
+      margin: auto;
+      padding: 20px;
+      width: 70%;
+      max-width: 800px;
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: center;
+    }
+
+    .modal-content img {
+      width: 70%;
+      height: 70%;
+    }
+
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 25px;
+      color: white;
+      font-size: 35px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .prev, .next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 40px;
+      color: white;
+      cursor: pointer;
+      padding: 16px;
+      user-select: none;
+    }
+
+    .prev {
+      left: 10px;
+    }
+
+    .next {
+      right: 10px;
+    }
+
+    #slideCaption {
+      color: white;
+      font-size: 18px;
+      padding: 10px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>RENTALS TO LET IN EMBU</h1>
+  <nav>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="help.html">Help</a>
+  </nav>
+  <input type="text" class="search" placeholder="Search by title..." oninput="filterHouses(this.value)">
+
+  <div class="grid" id="housesGrid">
+    <!-- rental 1 -->
+    <div class="house" data-title="Goshen apartment" onclick="openSlide(0)">
+      <img src="twobedroomapartment.jpeg" alt="Goshen apartment" width="400" height="200">
+      <p>Goshen apartment – 2 bedroom</p>
+    </div>
+    <!-- rental 2 -->
+    <div class="house" data-title="Summer Villa House" onclick="openSlide(1)">
+      <img src="onebedroomapartment.jpeg" alt="Summer Villa House House" width="400" height="200">
+      <p>summer Villa House – 1 bedroom</p>
+    </div>
+    <!-- rental 3 -->
+    <div class="house" data-title="Moonstar Flat apartment" onclick="openSlide(2)">
+      <img src="img.webp" alt="Moonstar Flat apartment" width="400" height="200">
+      <p>Moonstar Flat apartment – single room</p>
+    </div>
+    <!-- rental 4 -->
+    <div class="house" data-title="wazara house" onclick="openSlide(3)">
+      <img src="me.jpg" alt="wazara house" width="400" height="200">
+      <p>Wazara house – bedsitter self contained</p>
+    </div>
+    <div class="house" data-title="Townhouse" onclick="openSlide(3)">
+      <img src="bedsitter.jpg" alt="Townhouse" width="400" height="200">
+      <p>Townhouse – bedsitter self contained</p>
+    </div>
+    <div class="house" data-title="flat3 house" onclick="openSlide(3)">
+      <img src="flat3.jpg" alt="flat3 house" width="400" height="200">
+      <p>flat3 house – self contained</p>
+    </div>
+    <!-- Additional rental for bottom row -->
+    <div class="house" data-title="Modern Villa" onclick="openSlide(4)" style="display:none;">
+      <img src="innerrhouse.jpg" alt="Modern Villa" width="400" height="300">
+      <p>Modern Villa – 3 bedroom</p>
+    </div>
+    <!-- Additional rental for bottom row -->
+    <div class="house" data-title="Garden Apartment" onclick="openSlide(5)" style="display:none;">
+      <img src="placeholder.jpg" alt="Garden Apartment" width="400" height="300">
+      <p>Garden Apartment – 2 bedroom</p>
+    </div>
+  </div>
+  
+
+  <!-- Slideshow modal -->
+  <div id="slideModal" class="modal">
+    <span class="close" onclick="closeSlide()">&times;</span>
+    <div class="modal-content">
+      <img id="slideImage" src="" alt="">
+      <div id="slideCaption"></div>
+      <a class="prev" onclick="changeSlide(-1)">&#10094;</a>
+      <a class="next" onclick="changeSlide(1)">&#10095;</a>
+    </div>
+  </div>
+
+  <script>
+    // Updated houses array to match all items
+    const houses = [
+      {title:"Goshen apartment", img:"twobedroomapartment.jpeg", desc:"2 bedroom Goshen style"},
+      {title:"Summer Villa House House", img:"onebedroomapartment.jpeg", desc:"1 bedroom colonial style"},
+      {title:"Moonstar Flat apartment", img:"singleroom.jpg", desc:"Moonstar style"},
+      {title:"wazara house", img:"bedsitter.jpg", desc:"bedsiter self contained"},
+      {title:"Modern Villa", img:"placeholder.jpg", desc:"3 bedroom modern villa"},
+      {title:"Garden Apartment", img:"placeholder.jpg", desc:"2 bedroom garden apartment"}
+    ];
+
+    let currentIndex = 0;
+
+    function filterHouses(query) {
+      const cards = document.querySelectorAll('.house');  // Fixed selector
+      query = query.toLowerCase();
+      cards.forEach(card => {
+        const title = card.getAttribute('data-title').toLowerCase();
+        card.style.display = title.includes(query) ? 'block' : 'none';
+      });
+    }
+
+    function openSlide(i) {
+      currentIndex = i;
+      const modal = document.getElementById('slideModal');
+      const img = document.getElementById('slideImage');
+      const cap = document.getElementById('slideCaption');
+      img.src = houses[i].img;
+      cap.textContent = houses[i].desc;
+      modal.style.display = 'block';
+    }
+
+    function closeSlide() {
+      document.getElementById('slideModal').style.display = 'none';
+    }
+
+    function changeSlide(step) {
+      currentIndex = (currentIndex + step + houses.length) % houses.length;
+      const img = document.getElementById('slideImage');
+      const cap = document.getElementById('slideCaption');
+      img.src = houses[currentIndex].img;
+      cap.textContent = houses[currentIndex].desc;
+    }
+
+    // Close modal when clicking outside content
+    window.onclick = function(e) {
+      const modal = document.getElementById('slideModal');
+      if (e.target === modal) closeSlide();
+    };
+  </script>
+</body>
+</html>
